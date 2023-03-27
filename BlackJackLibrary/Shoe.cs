@@ -50,6 +50,10 @@ namespace BlackJackLibrary
         private uint numDecks = 6;  
         //List of callbacks (1 per client)
         private HashSet<ICallback> callbacks= new HashSet<ICallback>();
+        //Client's ids
+        private HashSet<Client> clients = new HashSet<Client>();
+        // Number of players
+        private static uint numPlayers = 0;
 
         // Default constructor: populates the cards collection
         public Shoe()
@@ -78,7 +82,8 @@ namespace BlackJackLibrary
             get { return (uint)(cards.Count - cardsIndex); }
         }
 
-        //Public Methods
+        //Public Methods   
+
         //Draw method: Returns a Card; the next available Card in the cards collection
         public Card Draw()
         {
@@ -101,35 +106,71 @@ namespace BlackJackLibrary
             cards = cards.OrderBy(card => rng.Next()).ToList();
 
             cardsIndex = 0;
-            UpdateAllClients(true);
+            //UpdateAllClients(true);
         }
 
-        public void RegisterForCallbacks()
+        //Register the client for callback and returns an int representing the client's id.
+        public uint RegisterForCallbacks()
         {
             ICallback callback = OperationContext.Current.GetCallbackChannel<ICallback>();
             //The Add method in the HashSet only adds a element if it is a new element
-            //No need to test if callbacks contains the callback
-            callbacks.Add(callback);
+            if (callbacks.Add(callback))
+            {
+                ++numPlayers;
+                Client client = new Client(numPlayers, 0, $"Player {numPlayers}");
+                clients.Add(client);
+                return client.ClientID;
+            }
+            else
+            {
+                return 0;
+            }
+                
         }
 
-        public void UnregisterForCallbacks()
+        public void UnregisterForCallbacks(uint clientId)
         {
             ICallback callback = OperationContext.Current.GetCallbackChannel<ICallback>();
-            //The Remoce method in the HashSet only adds a element if it is a new element
-            //No need to test if callbacks contains the callback
-            callbacks.Remove(callback);
-        }
-
-        private void UpdateAllClients(bool emptyHand)
-        {
-            LibraryCallback info = new LibraryCallback(NumCards, numDecks, emptyHand);
-
-            foreach (ICallback calback in callbacks)
+            //The Remove method in the HashSet only adds a element if it is a new element
+            Client client = clients.First(e => e.ClientID == clientId);
+            if (client != null)
             {
-                calback.UpdateClient(info);
+                clients.Remove(client);
+                callbacks.Remove(callback);
+                LibraryCallback info = new LibraryCallback(clients);
+                foreach (ICallback calback in callbacks)
+                {
+                    calback.UpdateClient(info);
+                }
             }
         }
 
+        //private void UpdateAllClients(bool emptyHand)
+        //{
+        //    LibraryCallback info = new LibraryCallback(NumCards, numDecks, emptyHand);
+
+        //    foreach (ICallback calback in callbacks)
+        //    {
+        //        calback.UpdateClient(info);
+        //    }
+        //}
+
+        public void UpdateLibraryWithClientInfo(uint clientId, uint clientPoints)
+        {
+            //Finds the client in the list to be updated by its ID
+            Client client = clients.First(e => e.ClientID == clientId);
+            if (client != null)
+            {
+                clients.Remove(client);
+                client.TotalPoints = clientPoints;
+                clients.Add(client);
+                LibraryCallback info = new LibraryCallback(clients);
+                foreach (ICallback calback in callbacks)
+                {
+                    calback.UpdateClient(info);
+                }
+            } 
+        }
 
 
         // Helper methods
@@ -162,5 +203,6 @@ namespace BlackJackLibrary
             Shuffle();
         }
 
+       
     } // end class
 }

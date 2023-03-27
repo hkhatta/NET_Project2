@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CardsGUIClient"
         mc:Ignorable="d"
-        Title="My Cards" Height="500" Width="700" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="My Cards" Height="550" Width="829" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Grid RenderTransformOrigin="0.5,0.5">
         <Grid.Background>
             <ImageBrush ImageSource="Images/blackjacktable.jpg"/>
@@ -21,27 +21,27 @@
                 <TranslateTransform/>
             </TransformGroup>
         </Grid.RenderTransform>
-        <ListBox x:Name="ListCards" BorderThickness="3" FontSize="100" HorizontalAlignment="Left" Height="114" Margin="153,356,0,0" VerticalAlignment="Top" Width="394" Background="Transparent" Grid.ColumnSpan="2" >
+        <ListBox x:Name="ListCards" BorderThickness="3" FontSize="100" HorizontalAlignment="Left" Height="149" Margin="153,356,0,0" VerticalAlignment="Top" Width="512" Background="Transparent" Grid.ColumnSpan="2" >
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
-        <Label Content="Cards in Hand" FontSize="20" HorizontalAlignment="Left" Height="41" Margin="281,312,0,0" VerticalAlignment="Top" Width="137" Grid.ColumnSpan="2"/>
-        <Button x:Name="ButtonHit" Content="Hit" Grid.Column="1" HorizontalAlignment="Left" Height="35" Margin="208,356,0,0" VerticalAlignment="Top" Width="138" Click="ButtonHit_Click"/>
-        <Button x:Name="ButtonStand" Content="Stand" HorizontalAlignment="Left" Height="35" Margin="208,396,0,0" VerticalAlignment="Top" Width="138" Click="ButtonStand_Click" Grid.Column="1"/>
-        <Button x:Name="ButtonClose" Content="Quit" Grid.Column="1" HorizontalAlignment="Left" Height="35" Margin="208,439,0,0" VerticalAlignment="Top" Width="138" Click="ButtonClose_Click"/>
-        <Label Content="You Have a Total of: ##" HorizontalAlignment="Left" Height="26" Margin="153,332,0,0" VerticalAlignment="Top" Width="206" Grid.ColumnSpan="2"/>
-        <Label Content="It Is Currently Player #'s Turn..." HorizontalAlignment="Left" Height="26" Margin="10,275,0,0" VerticalAlignment="Top" Width="206"/>
-        <ListBox x:Name="ListCards_Copy" BorderThickness="3" FontSize="100" HorizontalAlignment="Left" Height="164" Margin="10,306,0,0" VerticalAlignment="Top" Width="118" Background="Transparent" SelectionChanged="ListCards_Copy_SelectionChanged"/>
-        <ListBox x:Name="ListDealerCards" BorderThickness="3" FontSize="100" HorizontalAlignment="Left" Height="114" Margin="153,8,0,0" VerticalAlignment="Top" Width="394" Background="Transparent" Grid.ColumnSpan="2" >
+        <Label Content="Cards in Hand" FontSize="20" HorizontalAlignment="Left" Height="41" Margin="334,285,0,0" VerticalAlignment="Top" Width="150" Grid.ColumnSpan="2" FontWeight="Bold" Background="{x:Null}"/>
+        <Button x:Name="ButtonHit" Content="Hit" Grid.Column="1" HorizontalAlignment="Left" Height="35" Margin="267,362,0,0" VerticalAlignment="Top" Width="138" Click="ButtonHit_Click"/>
+        <Button x:Name="ButtonStand" Content="Stand" HorizontalAlignment="Left" Height="35" Margin="267,402,0,0" VerticalAlignment="Top" Width="138" Click="ButtonStand_Click" Grid.Column="1"/>
+        <Button x:Name="ButtonClose" Content="Quit" Grid.Column="1" HorizontalAlignment="Left" Height="35" Margin="267,445,0,0" VerticalAlignment="Top" Width="138" Click="ButtonClose_Click"/>
+        <Label x:Name="currentPoints" Content="You Have a Total of: " HorizontalAlignment="Left" Height="26" Margin="153,326,0,0" VerticalAlignment="Top" Width="512" FontSize="14" FontWeight="Bold" Grid.ColumnSpan="2"/>
+        <Label Content="It Is Currently Player #'s Turn..." HorizontalAlignment="Left" Height="26" Margin="10,275,0,0" VerticalAlignment="Top" Width="220" FontWeight="Bold" FontSize="14"/>
+        <ListBox x:Name="ListPlayers" BorderThickness="3" FontSize="12" HorizontalAlignment="Left" Height="199" Margin="10,306,0,0" VerticalAlignment="Top" Width="118" Background="Transparent" SelectionChanged="ListCards_Copy_SelectionChanged"/>
+        <ListBox x:Name="ListDealerCards" BorderThickness="3" FontSize="100" HorizontalAlignment="Left" Height="114" Margin="153,8,0,0" VerticalAlignment="Top" Width="512" Background="Transparent" Grid.ColumnSpan="2" >
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
-        <Label Content="Cards in Dealer's Hand" FontSize="20" HorizontalAlignment="Left" Height="41" Margin="241,127,0,0" VerticalAlignment="Top" Width="218" Grid.ColumnSpan="2"/>
+        <Label Content="Cards in Dealer's Hand" FontSize="20" HorizontalAlignment="Left" Height="41" Margin="305,127,0,0" VerticalAlignment="Top" Width="219" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>
