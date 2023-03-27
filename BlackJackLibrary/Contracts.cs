@@ -28,8 +28,10 @@ namespace BlackJackLibrary
         uint NumDecks { [OperationContract] get; [OperationContract] set; }
         uint NumCards { [OperationContract] get; }
         [OperationContract]
-        void RegisterForCallbacks();
+        uint RegisterForCallbacks();
         [OperationContract]
-        void UnregisterForCallbacks();
+        void UnregisterForCallbacks(uint clientId);
+        [OperationContract(IsOneWay = true)]
+        void UpdateLibraryWithClientInfo(uint clientId, uint clientPoints);
     }
 }

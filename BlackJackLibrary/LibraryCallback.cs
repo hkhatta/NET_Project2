@@ -13,18 +13,19 @@ namespace BlackJackLibrary
     [DataContract]
     public class LibraryCallback
     {
+        //[DataMember]
+        //public uint NumCards { get; private set; }
+        //[DataMember]
+        //public uint NumDecks { get; private set; }
+        //[DataMember]
+        //public bool IsEmptyHand { get; private set; }
+     
         [DataMember]
-        public uint NumCards { get; private set; }
-        [DataMember]
-        public uint NumDecks { get; private set; }
-        [DataMember]
-        public bool IsEmptyHand { get; private set; }
+        public HashSet<Client> Clients { get; private set; }
 
-        public LibraryCallback(uint numCards, uint numDecks, bool isEmptyHand)
-        {
-            NumCards = numCards;
-            NumDecks = numDecks;
-            IsEmptyHand = isEmptyHand;
+        public LibraryCallback(HashSet<Client> clients)
+        {            
+            Clients = clients;
         }
 
     }

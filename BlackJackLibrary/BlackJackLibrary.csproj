@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Card.cs" />
+    <Compile Include="Client.cs" />
     <Compile Include="Contracts.cs" />
     <Compile Include="LibraryCallback.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
