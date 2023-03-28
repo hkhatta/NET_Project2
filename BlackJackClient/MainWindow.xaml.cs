@@ -30,6 +30,7 @@ namespace CardsGUIClient
         private readonly IShoe shoe = null; // Note: Type IShoe instead of Shoe
         private bool isClientTurn = true;
         private uint clientId;
+        
         // ------------------------ Constructor -----------------------
         public MainWindow()
         {
@@ -37,9 +38,9 @@ namespace CardsGUIClient
 
             try
             {
-
                 DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this,"ShoeEndPoint");
                 shoe = channel.CreateChannel();
+                LibraryCallback info = new LibraryCallback(shoe.getClients());
                 clientId = shoe.RegisterForCallbacks();
                 Card card1 = shoe?.Draw();
                 Card card2 = shoe?.Draw();
@@ -102,28 +103,40 @@ namespace CardsGUIClient
                 if (isClientTurn) 
                 {
                     isClientTurn = false;
+                    // if they choose stand, update their took stand value
+                    foreach (Client client in shoe.getClients())
+                    {
+                        if (client.ClientID == clientId)
+                        {
+                            client.TookStand = true;
+                        }
+                    }
                     MessageBox.Show("You chose to stand. Wait for the round's results.");
                 }
                 else
                 {
                     bool isSomeonesTurn = false;
-                    LibraryCallback info = new LibraryCallback(shoe.getClients());
-
+              
                     foreach(Client client in shoe.getClients())
                     {
-                        // if client turn, isSomeonesturn = true
-                        // else pass
-                        
+                        if (client.TookStand == true) {
+                            continue; // do nothing
+                        }
+                        else
+                        {
+                            isSomeonesTurn = true;
+                        }
                     }
 
+
                     // if it's nobodies turn, draw for the dealer
-                    if (!(isSomeonesTurn))
+                    if (isSomeonesTurn)
                     {
-                        MessageBox.Show("Another player is playing.", "Wait for your turn");
+                        MessageBox.Show($"Another player is playing.", $"Wait for your turn "); //[{isSomeonesTurn}]
                     }
                     else
                     {
-                        // ListDealerCards_SelectionChanged
+                        ListDealerCards_SelectionChanged(sender, e);
                     }
                 }
             }
@@ -196,15 +209,16 @@ namespace CardsGUIClient
         {
 
         }
-        private void ListDealerCards_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void ListDealerCards_SelectionChanged(object sender, EventArgs e)
         {
-            /* IMPLEMENTATION ATTEMPT
+            MessageBox.Show("LOG - DEALING DEALER CARDS");
+            /* IMPLEMENTATION ATTEMPT */
             Card card1 = shoe?.Draw();
             Card card2 = shoe?.Draw();
             ListDealerCards.Items.Insert(0, card2);
             ListDealerCards.Items.Insert(0, card1);
             UpdateCardCounts();
-            */
+            
         }
 
         //ICallback interface method implementation
