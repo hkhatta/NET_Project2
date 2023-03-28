@@ -11,6 +11,7 @@
  *                  
  *                  Note that we had to add a reference to the .NET Framework 
  *                  assembly System.ServiceModel.dll.
+ *                  assembly System.ServiceModel.dll.
  */
 
 using System;
@@ -105,7 +106,25 @@ namespace CardsGUIClient
                 }
                 else
                 {
-                    MessageBox.Show("Another player is playing.", "Wait for your turn");
+                    bool isSomeonesTurn = false;
+                    LibraryCallback info = new LibraryCallback(shoe.getClients());
+
+                    foreach(Client client in shoe.getClients())
+                    {
+                        // if client turn, isSomeonesturn = true
+                        // else pass
+                        
+                    }
+
+                    // if it's nobodies turn, draw for the dealer
+                    if (!(isSomeonesTurn))
+                    {
+                        MessageBox.Show("Another player is playing.", "Wait for your turn");
+                    }
+                    else
+                    {
+                        // ListDealerCards_SelectionChanged
+                    }
                 }
             }
             catch (Exception ex)
@@ -162,8 +181,6 @@ namespace CardsGUIClient
             shoe.UpdateLibraryWithClientInfo(clientId, cardsOnHandCount);
 
         }
-
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             shoe?.UnregisterForCallbacks(clientId);
@@ -178,6 +195,16 @@ namespace CardsGUIClient
         private void ListCards_Copy1_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
 
+        }
+        private void ListDealerCards_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            /* IMPLEMENTATION ATTEMPT
+            Card card1 = shoe?.Draw();
+            Card card2 = shoe?.Draw();
+            ListDealerCards.Items.Insert(0, card2);
+            ListDealerCards.Items.Insert(0, card1);
+            UpdateCardCounts();
+            */
         }
 
         //ICallback interface method implementation

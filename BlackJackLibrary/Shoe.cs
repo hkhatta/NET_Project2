@@ -92,6 +92,7 @@ namespace BlackJackLibrary
                 throw new InvalidOperationException("No card available in the shoe.");
             }
             Card card = cards[cardsIndex++];
+
             //UpdateAllClients(false);
             Console.WriteLine($"Shoe dealing {cards[cardsIndex]}");
             return card;
@@ -203,6 +204,16 @@ namespace BlackJackLibrary
             Shuffle();
         }
 
+        // for iterating through the shoe in the MainWindow.xaml.cs
+        // doesnt work
+        public int NumClients()
+        {
+            return clients.Count;
+        }
+        public HashSet<Client> getClients()
+        {
+            return clients;
+        }
        
     } // end class
 }

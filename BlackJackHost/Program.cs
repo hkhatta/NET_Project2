@@ -16,7 +16,6 @@ namespace BlackJackHost
         static void Main()
         {
             ServiceHost servHost = null;
-
             try
             {
                 // Instantiate the SertviceHost (endpoint configuration is 
