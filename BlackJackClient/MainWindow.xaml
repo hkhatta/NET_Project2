@@ -32,8 +32,8 @@
         <Button x:Name="ButtonHit" Content="Hit" Grid.Column="1" HorizontalAlignment="Left" Height="35" Margin="267,362,0,0" VerticalAlignment="Top" Width="138" Click="ButtonHit_Click"/>
         <Button x:Name="ButtonStand" Content="Stand" HorizontalAlignment="Left" Height="35" Margin="267,402,0,0" VerticalAlignment="Top" Width="138" Click="ButtonStand_Click" Grid.Column="1"/>
         <Button x:Name="ButtonClose" Content="Quit" Grid.Column="1" HorizontalAlignment="Left" Height="35" Margin="267,445,0,0" VerticalAlignment="Top" Width="138" Click="ButtonClose_Click"/>
-        <Label x:Name="currentPoints" Content="You Have a Total of: " HorizontalAlignment="Left" Height="26" Margin="153,326,0,0" VerticalAlignment="Top" Width="512" FontSize="14" FontWeight="Bold" Grid.ColumnSpan="2"/>
-        <Label Content="It Is Currently Player #'s Turn..." HorizontalAlignment="Left" Height="26" Margin="10,275,0,0" VerticalAlignment="Top" Width="220" FontWeight="Bold" FontSize="14"/>
+        <Label x:Name="currentPoints" Content="You Have a Total of: " HorizontalAlignment="Left" Height="36" Margin="153,320,0,0" VerticalAlignment="Top" Width="512" FontSize="14" FontWeight="Bold" Grid.ColumnSpan="2"/>
+        <Label x:Name="CurrentPlayer" Content="It Is Currently Player #'s Turn..." HorizontalAlignment="Left" Height="29" Margin="10,265,0,0" VerticalAlignment="Top" Width="220" FontWeight="Bold" FontSize="14"/>
         <ListBox x:Name="ListPlayers" BorderThickness="3" FontSize="12" HorizontalAlignment="Left" Height="199" Margin="10,306,0,0" VerticalAlignment="Top" Width="118" Background="Transparent" SelectionChanged="ListCards_Copy_SelectionChanged"/>
         <ListBox x:Name="ListDealerCards" BorderThickness="3" FontSize="100" HorizontalAlignment="Left" Height="114" Margin="153,8,0,0" VerticalAlignment="Top" Width="512" Background="Transparent" Grid.ColumnSpan="2" SelectionChanged="ListDealerCards_SelectionChanged" >
             <ListBox.ItemsPanel>
