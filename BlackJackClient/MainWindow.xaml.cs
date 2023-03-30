@@ -17,6 +17,7 @@ using System;
 using System.Windows;
 using System.ServiceModel;  // WCF types
 using BlackJackLibrary;
+using System.Threading;
 
 namespace CardsGUIClient
 {
@@ -27,8 +28,10 @@ namespace CardsGUIClient
     {
         // --------------------- Member variables ---------------------
         private readonly IShoe shoe = null; // Note: Type IShoe instead of Shoe
-        private bool isClientTurn = true;
-        private uint clientId;
+        private bool isClientTurn = false;
+        private uint clientId, activeClientId;
+        private bool stand;
+        private uint cardsOnHandCount = 0;
         // ------------------------ Constructor -----------------------
         public MainWindow()
         {
@@ -40,10 +43,16 @@ namespace CardsGUIClient
                 DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this,"ShoeEndPoint");
                 shoe = channel.CreateChannel();
                 clientId = shoe.RegisterForCallbacks();
+                //If client id == 1 this is the first player so far
+                //Release this client
+                if (clientId == 1)
+                    isClientTurn= true;
+
+
                 Card card1 = shoe?.Draw();
                 Card card2 = shoe?.Draw();
-                ListCards.Items.Insert(0, card2);
-                ListCards.Items.Insert(0, card1);
+                ListCards.Items.Add(card2);
+                ListCards.Items.Add(card1);
 
                 UpdateCardCounts();
             }
@@ -65,26 +74,13 @@ namespace CardsGUIClient
                 {
                     // Modified to receive a string instead of a Card object from Draw()
                     Card card = shoe?.Draw();
-                    ListCards.Items.Insert(0, card);
-
-                    //int totalValue = 0;
-                    //foreach (Card c in ListCards.Items)
-                    //{
-                    //    totalValue += (int)c.Rank;
-                    //}
-
-                    //if (totalValue > 21)
-                    //{
-                    //    isClientTurn = false;
-                    //}
+                    ListCards.Items.Add(card);
 
                     UpdateCardCounts();
-
-                    //if (!isClientTurn)
-                    //{
-                    //    shoe?.Shuffle();
-                    //    UpdateCardCounts();
-                    //}
+                }
+                else
+                {
+                    MessageBox.Show("Another player is playing.", "Wait for your turn");
                 }
             }
             catch (Exception ex)
@@ -101,6 +97,8 @@ namespace CardsGUIClient
                 if (isClientTurn) 
                 {
                     isClientTurn = false;
+                    stand = true;
+                    shoe.UpdateLibraryWithClientInfo(clientId, cardsOnHandCount, stand);
                     MessageBox.Show("You chose to stand. Wait for the round's results.");
                 }
                 else
@@ -127,8 +125,10 @@ namespace CardsGUIClient
         // Reinitializes the Shoe and Hand card counts in the GUI
         private void UpdateCardCounts()
         {
-            uint cardsOnHandCount = 0;
-            currentPoints.Content = "You have a total of: ";
+            
+            currentPoints.Content = $"Player {clientId}, You have a total of: ";
+            CurrentPlayer.Content = $"Current player playing: ";
+            cardsOnHandCount = 0;
             foreach (Card card in ListCards.Items)
             {
                 //If the card is an ace and the sum of points are 
@@ -142,26 +142,29 @@ namespace CardsGUIClient
                     cardsOnHandCount += (uint)card.Rank;
                 }                
             }
-            currentPoints.Content += cardsOnHandCount.ToString() + " points";
+            currentPoints.Content += cardsOnHandCount.ToString() + " points. ";
 
             if(cardsOnHandCount == 21)
             {
-                MessageBox.Show("You got Blackjack!","Congratulations!!!");
+                currentPoints.Content += "Congratulations! You got a Blackjack!";
+                stand = true;
                 isClientTurn = false;
             }
 
             if (cardsOnHandCount > 21)
             {
                 isClientTurn = false;
-                MessageBox.Show("You are busted!","Bad luck...");
-                shoe?.Shuffle();
-                currentPoints.Content = "You have a total of: ";
+                currentPoints.Content += "You are busted!";
+                stand = true;
+                //shoe?.Shuffle();
+                //currentPoints.Content = "You have a total of: ";
             }
 
             //Inform other clients the number of points
-            shoe.UpdateLibraryWithClientInfo(clientId, cardsOnHandCount);
+            shoe.UpdateLibraryWithClientInfo(clientId, cardsOnHandCount, stand);
 
         }
+
 
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -180,6 +183,7 @@ namespace CardsGUIClient
 
         }
 
+
         //ICallback interface method implementation
         //Receives an LibraryCallback object with the information from the library
         //Updates the client object with the information received
@@ -190,9 +194,26 @@ namespace CardsGUIClient
                 ListPlayers.Items.Clear();
                 foreach (var client in info.Clients)
                 {
-                    ListPlayers.Items.Add($"Player {client.ClientID}: {client.TotalPoints} points");
+                    ListPlayers.Items.Add($"Player {client.ClientID}: {client.Score}");
+                }
+                if(info.IsRoundDone)
+                {
+                    //reset player information
+                    MessageBox.Show("This round is over. Starting a new round.");
+                    ListCards.Items.Clear();
+                    cardsOnHandCount = 0;
+                    ListCards.Items.Add(info.ClientCards[0]);
+                    ListCards.Items.Add(info.ClientCards[1]);
+                    stand = false;
+                    UpdateCardCounts();                    
                 }
 
+                activeClientId = info.NextClientID;
+                CurrentPlayer.Content = $"Current player playing: Player {activeClientId}";
+                if (activeClientId == clientId)
+                {
+                    isClientTurn= true;
+                }
             }
             else
             {
@@ -200,5 +221,7 @@ namespace CardsGUIClient
                 this.Dispatcher.BeginInvoke(updateDelegate, info);
             }
         }
+
+       
     } // end partial class
 }

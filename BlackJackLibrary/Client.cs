@@ -16,12 +16,18 @@ namespace BlackJackLibrary
         public uint TotalPoints { get; set; }
         [DataMember]
         public string ClientName { get; set; }
+        [DataMember]
+        public uint Score { get; set; }
+        [DataMember]
+        public bool Stand { get; set; }
 
-        public Client(uint clientID, uint totalPoints, string clientName)
+        public Client(uint clientID, uint totalPoints, string clientName, uint score, bool stand)
         {
             ClientID = clientID;
             TotalPoints = totalPoints;
             ClientName = clientName;
+            Score = score;
+            Stand = stand;
         }
     }
 }

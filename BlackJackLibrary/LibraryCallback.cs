@@ -22,10 +22,19 @@ namespace BlackJackLibrary
      
         [DataMember]
         public HashSet<Client> Clients { get; private set; }
+        [DataMember]
+        public bool IsRoundDone { get; private set; }
+        [DataMember]
+        public List<Card> ClientCards { get; set; }
+        [DataMember]
+        public uint NextClientID { get; set; }
 
-        public LibraryCallback(HashSet<Client> clients)
-        {            
+        public LibraryCallback(HashSet<Client> clients, bool isRoundDone, List<Card> clientCards, uint nextClientID)
+        {
             Clients = clients;
+            IsRoundDone = isRoundDone;
+            ClientCards = clientCards;
+            NextClientID = nextClientID;
         }
 
     }

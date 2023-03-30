@@ -15,7 +15,7 @@ namespace BlackJackLibrary
         //Dictionary of cards: Key - name, value - integer value for a card
         private static readonly Dictionary<string, uint> ranks = new Dictionary<string, uint>()
         {
-            { "Cardback", 0 },
+            //{ "Cardback", 0 },
             { "Ace", 1 },
             { "Two", 2 },
             { "Three", 3},
@@ -50,10 +50,12 @@ namespace BlackJackLibrary
         private uint numDecks = 6;  
         //List of callbacks (1 per client)
         private HashSet<ICallback> callbacks= new HashSet<ICallback>();
-        //Client's ids
+        //List of clients
         private HashSet<Client> clients = new HashSet<Client>();
         // Number of players
         private static uint numPlayers = 0;
+        //Next client to play
+        private uint nextClientId = 1;
 
         // Default constructor: populates the cards collection
         public Shoe()
@@ -117,7 +119,7 @@ namespace BlackJackLibrary
             if (callbacks.Add(callback))
             {
                 ++numPlayers;
-                Client client = new Client(numPlayers, 0, $"Player {numPlayers}");
+                Client client = new Client(numPlayers, 0, $"Player {numPlayers}", 0, false);
                 clients.Add(client);
                 return client.ClientID;
             }
@@ -133,11 +135,16 @@ namespace BlackJackLibrary
             ICallback callback = OperationContext.Current.GetCallbackChannel<ICallback>();
             //The Remove method in the HashSet only adds a element if it is a new element
             Client client = clients.First(e => e.ClientID == clientId);
+            if(nextClientId == clientId)
+            {
+                nextClientId = FindNextClientID(clients, client);
+            }
+                
             if (client != null)
             {
                 clients.Remove(client);
                 callbacks.Remove(callback);
-                LibraryCallback info = new LibraryCallback(clients);
+                LibraryCallback info = new LibraryCallback(clients, false, new List<Card>(), nextClientId);
                 foreach (ICallback calback in callbacks)
                 {
                     calback.UpdateClient(info);
@@ -155,26 +162,63 @@ namespace BlackJackLibrary
         //    }
         //}
 
-        public void UpdateLibraryWithClientInfo(uint clientId, uint clientPoints)
+        public void UpdateLibraryWithClientInfo(uint clientId, uint clientPoints, bool stand)
         {
             //Finds the client in the list to be updated by its ID
             Client client = clients.First(e => e.ClientID == clientId);
+
+            //Check if the client stands and update the next client ID
+            if(stand)
+                nextClientId = FindNextClientID(clients, client);
+
+
             if (client != null)
             {
                 clients.Remove(client);
                 client.TotalPoints = clientPoints;
+                client.Stand = stand;
                 clients.Add(client);
-                LibraryCallback info = new LibraryCallback(clients);
-                foreach (ICallback calback in callbacks)
+                bool isRoundFinished = ComputeRoundResults(ref clients);
+                LibraryCallback info = new LibraryCallback(clients, isRoundFinished, new List<Card>(), nextClientId);
+                if (isRoundFinished)
                 {
-                    calback.UpdateClient(info);
+                    Shuffle();
+                    //deal 2 new cards for each player                    
+                    foreach (ICallback calback in callbacks)
+                    {
+                        List<Card> cards = new List<Card>() { Draw(), Draw(), };
+                        info.ClientCards = cards;
+                        calback.UpdateClient(info);
+                    }
                 }
+                else
+                {
+                    foreach (ICallback calback in callbacks)
+                    {
+                        calback.UpdateClient(info);
+                    }
+                }
+                
+                
+                
             } 
         }
 
 
         // Helper methods
 
+        
+        private uint FindNextClientID(HashSet<Client> clients, Client currentClient)
+        {
+            int nextClientIndex = Array.IndexOf(clients.ToArray(), currentClient) + 1;
+            uint nextId;
+            if (nextClientIndex >= clients.Count)
+                nextId = clients.ElementAt(0).ClientID;
+            else
+                nextId = clients.ElementAt(nextClientIndex).ClientID;
+            return nextId;
+        }
+        
         //Repopulate Method: Clears the cards collection, populates it with new cards
         // and then randomizes the cards collection
         private void Repopulate()
@@ -203,6 +247,42 @@ namespace BlackJackLibrary
             Shuffle();
         }
 
-       
+
+        //
+        private bool ComputeRoundResults(ref HashSet<Client> clients)
+        {
+            //check if any client got a blackjack
+            var client = clients.FirstOrDefault(element => element.Score == 21);
+            if (client != null)
+            {
+                client.Score++;
+                return true;
+            }
+            //check if all clients have stand
+            client = clients.FirstOrDefault(element => element.Stand == false);
+            if (client == null)
+            {
+                //find client with highest points
+                var orderedClients = clients.Where(element => element.TotalPoints < 21).OrderBy(element => element.TotalPoints);
+                if(orderedClients.ToArray().Length != 0)
+                {
+                    client = orderedClients.Last();
+                    var highestPoints = client.TotalPoints;
+                    //check if there are other clients with the same total points
+                    var winners = orderedClients.Where(element => element.TotalPoints == highestPoints);
+                    
+                    //loop through the winners and add a point to the score
+                    foreach(var winner in winners)
+                    {
+                        winner.Score++;
+                    }
+                    
+                }
+                return true;
+            }
+
+            return false;
+        }
+
     } // end class
 }
