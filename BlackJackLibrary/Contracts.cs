@@ -27,11 +27,15 @@ namespace BlackJackLibrary
         Card Draw();
         uint NumDecks { [OperationContract] get; [OperationContract] set; }
         uint NumCards { [OperationContract] get; }
+        // HashSet<Client> clients { get; } // error
+
         [OperationContract]
         uint RegisterForCallbacks();
         [OperationContract]
         void UnregisterForCallbacks(uint clientId);
         [OperationContract(IsOneWay = true)]
+
         void UpdateLibraryWithClientInfo(uint clientId, uint clientPoints, bool stand);
+
     }
 }

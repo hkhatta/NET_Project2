@@ -11,6 +11,7 @@
  *                  
  *                  Note that we had to add a reference to the .NET Framework 
  *                  assembly System.ServiceModel.dll.
+ *                  assembly System.ServiceModel.dll.
  */
 
 using System;
@@ -28,10 +29,12 @@ namespace CardsGUIClient
     {
         // --------------------- Member variables ---------------------
         private readonly IShoe shoe = null; // Note: Type IShoe instead of Shoe
+
         private bool isClientTurn = false;
         private uint clientId, activeClientId;
         private bool stand;
         private uint cardsOnHandCount = 0;
+
         // ------------------------ Constructor -----------------------
         public MainWindow()
         {
@@ -39,9 +42,9 @@ namespace CardsGUIClient
 
             try
             {
-
                 DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this,"ShoeEndPoint");
                 shoe = channel.CreateChannel();
+                LibraryCallback info = new LibraryCallback(shoe.getClients());
                 clientId = shoe.RegisterForCallbacks();
                 //If client id == 1 this is the first player so far
                 //Release this client
@@ -97,13 +100,36 @@ namespace CardsGUIClient
                 if (isClientTurn) 
                 {
                     isClientTurn = false;
+
                     stand = true;
                     shoe.UpdateLibraryWithClientInfo(clientId, cardsOnHandCount, stand);
                     MessageBox.Show("You chose to stand. Wait for the round's results.");
                 }
                 else
                 {
-                    MessageBox.Show("Another player is playing.", "Wait for your turn");
+                    bool isSomeonesTurn = false;
+              
+                    foreach(Client client in shoe.getClients())
+                    {
+                        if (client.TookStand == true) {
+                            continue; // do nothing
+                        }
+                        else
+                        {
+                            isSomeonesTurn = true;
+                        }
+                    }
+
+
+                    // if it's nobodies turn, draw for the dealer
+                    if (isSomeonesTurn)
+                    {
+                        MessageBox.Show($"Another player is playing.", $"Wait for your turn "); //[{isSomeonesTurn}]
+                    }
+                    else
+                    {
+                        ListDealerCards_SelectionChanged(sender, e);
+                    }
                 }
             }
             catch (Exception ex)
@@ -181,6 +207,17 @@ namespace CardsGUIClient
         private void ListCards_Copy1_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
 
+        }
+        private void ListDealerCards_SelectionChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("LOG - DEALING DEALER CARDS");
+            /* IMPLEMENTATION ATTEMPT */
+            Card card1 = shoe?.Draw();
+            Card card2 = shoe?.Draw();
+            ListDealerCards.Items.Insert(0, card2);
+            ListDealerCards.Items.Insert(0, card1);
+            UpdateCardCounts();
+            
         }
 
 

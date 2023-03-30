@@ -1,4 +1,7 @@
-﻿using System;
+﻿/* Name:
+ * Program:
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +16,6 @@ namespace BlackJackHost
         static void Main()
         {
             ServiceHost servHost = null;
-
             try
             {
                 // Instantiate the SertviceHost (endpoint configuration is 
